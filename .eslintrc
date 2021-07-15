@@ -2,5 +2,11 @@
   "extends": [
     "oclif",
     "oclif-typescript"
-  ]
+  ],
+  "rules": {
+    "comma-dangle": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "semi": "off",
+    "max-depth": "off"
+  }
 }
