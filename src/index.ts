@@ -57,7 +57,7 @@ class Hyextract extends Command {
     const newPath = path.join(unimportedFilesDirectory, relFilePath);
     this.log(`moving unimported file ${filePath}`);
     this.log(`to ${newPath}`);
-    return fs.move(filePath, newPath);
+    return fs.move(filePath, newPath, {overwrite: true});
   }
 
   async run() {
@@ -164,10 +164,7 @@ class Hyextract extends Command {
             continue;
           }
           if (addInfo.status === HydrusAddFileStatus.Failed) {
-            if (userConfig.moveUnimportedFiles) {
-              await this.handleUnimportedFile(newFilePath, userConfig.tempDirectory, userConfig.unimportedFilesDirectory);
-            }
-            continue;
+            throw new Error('Hydrus returned failed status');
           }
           if (userConfig.customServicesToTags) {
             const numCustomTags = Object.values(userConfig.customServicesToTags).map(arr => arr.length).reduce((p, c) => p + c);
