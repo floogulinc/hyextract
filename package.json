@@ -41,7 +41,8 @@
   },
   "files": [
     "/bin",
-    "/lib"
+    "/lib",
+    "/patches"
   ],
   "homepage": "https://github.com/floogulinc/hyextract",
   "keywords": [
