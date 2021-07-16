@@ -147,7 +147,11 @@ class Hyextract extends Command {
         continue;
       }
 
-      const newFiles = await FileHound.create().paths(path.join(userConfig.tempDirectory, archiveHash)).find();
+      const newFiles = await FileHound.create()
+      .paths(path.join(userConfig.tempDirectory, archiveHash))
+      .ignoreHiddenDirectories()
+      .ignoreHiddenFiles()
+      .find();
 
       this.log(`Found ${newFiles.length} files`);
 
