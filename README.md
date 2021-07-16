@@ -26,7 +26,7 @@ Running `hyextract` for the first time will create a config file, for example:
 {
   "hydrusApiUrl": "http://localhost:45869",
   "hydrusApiKey": "API_KEY_HERE",
-  "archivesDirectory": "E:\\hydrus export\\hyextract test",
+  "archivesDirectory": "E:\\hydrus export\\hyextract",
   "tempDirectory": "E:\\hyextract temp",
   "copyTags": true,
   "copyUrls": true,
