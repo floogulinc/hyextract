@@ -32,19 +32,30 @@ Running `hyextract` for the first time will create a config file, for example:
   "copyUrls": true,
   "tagServices": [
     "my tags",
+    "imported tags"
   ],
   "passwordNamespace": "password",
+  "passwordHexNamespace": "password hex",
   "tagBlacklist": [],
   "namespaceBlacklist": [
     "filename",
-    "password"
+    "password",
+    "password hex"
   ],
   "tagFilenames": true,
   "filenameTagService": "my tags",
   "deleteOriginalArchiveFromDirectory": true,
   "deleteOriginalArchiveFromHydrus": true,
-  "deleteTempFiles": true
+  "deleteTempFiles": true,
+  "customServicesToTags": {
+    "my tags": [
+      "hyextract"
+    ]
+  },
+  "moveUnimportedFiles": true,
+  "unimportedFilesDirectory": "E:\\hyextract unimported"
 }
+
 ```
 
 You will want to fill in your API key from Hydrus and setup any other settings like the directory for archives to process and the temp directory used for extracting them. The `passwordNamespace` option specifies the namespace hyextract will look for to find a password for password protected archives. If you ever want to regenerate this config file, run `hyextract --regenconfig`.
