@@ -2,8 +2,8 @@ import {Command, flags} from '@oclif/command'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as os from 'os'
-import { HydrusFile, lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey } from './hydrus-api'
-import { namespaceTagFromFile, serviceTags, getNamespace, getTagValue } from './tag-utils'
+import {HydrusFile, lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey} from './hydrus-api'
+import {namespaceTagFromFile, serviceTags, getNamespace, getTagValue} from './tag-utils'
 import * as util from 'util'
 import * as FileHound from 'filehound';
 import * as sevenZip from '7zip-standalone/lib/7zip-standalone';
@@ -17,6 +17,7 @@ interface UserConfig {
   copyUrls: boolean;
   tagServices: string[];
   passwordNamespace: string;
+  passwordHexNamespace: string;
   tagBlacklist: string[];
   namespaceBlacklist: string[];
   tagFilenames: boolean;
@@ -24,6 +25,13 @@ interface UserConfig {
   deleteOriginalArchiveFromDirectory: boolean;
   deleteOriginalArchiveFromHydrus: boolean;
   deleteTempFiles: boolean;
+  customServicesToTags: {
+    [service: string]: string[];
+  };
+}
+
+function decodeHex(hexString: string) {
+  return decodeURIComponent(hexString.replace(/[0-9a-f]{2}/g, '%$&'));
 }
 
 class Hyextract extends Command {
@@ -57,13 +65,19 @@ class Hyextract extends Command {
       copyUrls: true,
       tagServices: ['my tags'],
       passwordNamespace: 'password',
+      passwordHexNamespace: 'password hex',
       tagBlacklist: [],
       namespaceBlacklist: ['filename', 'password'],
       tagFilenames: true,
       filenameTagService: 'my tags',
       deleteOriginalArchiveFromDirectory: true,
       deleteOriginalArchiveFromHydrus: true,
-      deleteTempFiles: true
+      deleteTempFiles: true,
+      customServicesToTags: {
+        'my tags': [
+          'hyextract'
+        ]
+      }
     }
 
     if (!fs.existsSync(configPath) || flags.regenconfig) {
@@ -96,8 +110,10 @@ class Hyextract extends Command {
       const archiveFilePath = path.join(userConfig.archivesDirectory, entry.name);
       const archiveHash = path.parse(entry.name).name;
       const archiveMetadata = (await lookupMetadata([archiveHash], apiInfo)).data.metadata[0];
+
+      const passwordHexTag = namespaceTagFromFile(archiveMetadata, userConfig.passwordHexNamespace);
       const passwordTag = namespaceTagFromFile(archiveMetadata, userConfig.passwordNamespace);
-      const password = passwordTag ? getTagValue(passwordTag) : undefined;
+      const password = passwordHexTag ? decodeHex(getTagValue(passwordHexTag)) : passwordTag ? getTagValue(passwordTag) : undefined;
       if (password) {
         this.log(`archive password: ${password}`);
       }
@@ -123,6 +139,21 @@ class Hyextract extends Command {
           this.log(`added file, status: ${HydrusAddFileStatus[addInfo.status]}${addInfo.note.length > 1 ? ' (' + addInfo.note + ')' : ''}`);
           if (addInfo.status === HydrusAddFileStatus.Failed || addInfo.status === HydrusAddFileStatus.PreviouslyDeleted) {
             continue;
+          }
+          if (userConfig.customServicesToTags) {
+            const numCustomTags = Object.values(userConfig.customServicesToTags).map(arr => arr.length).reduce((p, c) => p + c);
+            if (numCustomTags > 0) {
+              try {
+                await addTags({
+                  hash: addInfo.hash,
+                  service_names_to_tags: userConfig.customServicesToTags
+                }, apiInfo);
+                this.log(`added ${numCustomTags} custom tags for file`)
+              } catch (error) {
+                this.warn('error adding custom tags');
+                this.warn(error);
+              }
+            }
           }
           if (userConfig.copyTags) {
             const tagsToAdd = Object.fromEntries(userConfig.tagServices.map(service =>
