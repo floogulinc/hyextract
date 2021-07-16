@@ -28,6 +28,8 @@ interface UserConfig {
   customServicesToTags: {
     [service: string]: string[];
   };
+  moveUnimportedFiles: boolean;
+  unimportedFilesDirectory: string;
 }
 
 function decodeHex(hexString: string) {
@@ -49,6 +51,14 @@ class Hyextract extends Command {
 
   async unpackArchive(pathToArchive: string, whereToUnpack: string, password?: string) {
     return sevenZip.extract(pathToArchive, whereToUnpack, ['-p' + (password ?? '')], data => data.forEach(s => this.log(s)));
+  }
+
+  async handleUnimportedFile(filePath: string, tempDirPath: string, unimportedFilesDirectory: string) {
+    const relFilePath = filePath.replace(tempDirPath, '');
+    const newPath = path.join(unimportedFilesDirectory, relFilePath);
+    this.log(`moving unimported file ${filePath}`);
+    this.log(`to ${newPath}`);
+    return fs.move(filePath, newPath);
   }
 
   async run() {
@@ -81,7 +91,9 @@ class Hyextract extends Command {
         'my tags': [
           'hyextract'
         ]
-      }
+      },
+      moveUnimportedFiles: true,
+      unimportedFilesDirectory: path.join(os.homedir(), 'hyextract unimported'),
     }
 
     if (!fs.existsSync(configPath) || flags.regenconfig) {
@@ -104,6 +116,10 @@ class Hyextract extends Command {
     }
 
     await fs.ensureDir(userConfig.tempDirectory);
+
+    if (userConfig.moveUnimportedFiles) {
+      await fs.ensureDir(userConfig.unimportedFilesDirectory);
+    }
 
     const archivesDir = await fs.opendir(userConfig.archivesDirectory);
 
@@ -141,7 +157,13 @@ class Hyextract extends Command {
         try {
           const addInfo = (await addFile(newFilePath, apiInfo)).data;
           this.log(`added file, status: ${HydrusAddFileStatus[addInfo.status]}${addInfo.note.length > 1 ? ' (' + addInfo.note + ')' : ''}`);
-          if (addInfo.status === HydrusAddFileStatus.Failed || addInfo.status === HydrusAddFileStatus.PreviouslyDeleted) {
+          if (addInfo.status === HydrusAddFileStatus.PreviouslyDeleted) {
+            continue;
+          }
+          if (addInfo.status === HydrusAddFileStatus.Failed) {
+            if (userConfig.moveUnimportedFiles) {
+              await this.handleUnimportedFile(newFilePath, userConfig.tempDirectory, userConfig.unimportedFilesDirectory);
+            }
             continue;
           }
           if (userConfig.customServicesToTags) {
@@ -196,6 +218,9 @@ class Hyextract extends Command {
           }
         } catch (error) {
           this.warn(error);
+          if (userConfig.moveUnimportedFiles) {
+            await this.handleUnimportedFile(newFilePath, userConfig.tempDirectory, userConfig.unimportedFilesDirectory);
+          }
           continue;
         }
       }
