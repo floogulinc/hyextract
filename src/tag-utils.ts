@@ -55,5 +55,5 @@ export function getTagValue(tag: string) {
 }
 
 export function serviceTags(file: HydrusFile, service: string) {
-  return tagsObjectFromFile(file)?.[service]?.['0'] ?? [];
+  return file.service_names_to_statuses_to_tags?.[service]?.['0'] ?? [];
 }
