@@ -67,7 +67,11 @@ class Hyextract extends Command {
       passwordNamespace: 'password',
       passwordHexNamespace: 'password hex',
       tagBlacklist: [],
-      namespaceBlacklist: ['filename', 'password'],
+      namespaceBlacklist: [
+        'filename',
+        'password',
+        'password hex'
+      ],
       tagFilenames: true,
       filenameTagService: 'my tags',
       deleteOriginalArchiveFromDirectory: true,
@@ -115,7 +119,7 @@ class Hyextract extends Command {
       const passwordTag = namespaceTagFromFile(archiveMetadata, userConfig.passwordNamespace);
       const password = passwordHexTag ? decodeHex(getTagValue(passwordHexTag)) : passwordTag ? getTagValue(passwordTag) : undefined;
       if (password) {
-        this.log(`archive password: ${password}`);
+        this.log(`archive password: "${password}"`);
       }
 
       this.log(`unpacking ${archiveFilePath}`)
