@@ -2,9 +2,8 @@ import {Command, flags} from '@oclif/command'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as os from 'os'
-import {HydrusFile, lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey} from './hydrus-api'
+import {lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey} from './hydrus-api'
 import {namespaceTagFromFile, serviceTags, getNamespace, getTagValue} from './tag-utils'
-import * as util from 'util'
 import * as FileHound from 'filehound';
 import * as sevenZip from '7zip-standalone/lib/7zip-standalone';
 

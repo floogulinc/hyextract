@@ -25,9 +25,9 @@ export function tagsObjectFromFile(file: HydrusFile): ServiceNamesToStatusesToTa
 }
 
 function allKnownTags(serviceNamesTostatusesToTags: ServiceNamesToStatusesToTags) {
-  if (serviceNamesTostatusesToTags
-    && 'all known tags' in serviceNamesTostatusesToTags
-    && '0' in serviceNamesTostatusesToTags['all known tags']) {
+  if (serviceNamesTostatusesToTags &&
+    'all known tags' in serviceNamesTostatusesToTags &&
+    '0' in serviceNamesTostatusesToTags['all known tags']) {
     return serviceNamesTostatusesToTags['all known tags']['0'];
   }
   return [];
