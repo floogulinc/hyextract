@@ -117,3 +117,11 @@ export async function associateUrl(args: HydrusAssociateUrlsRequest, {apiUrl, ap
     }
   });
 }
+
+export async function verifyAccessKey({apiUrl, apiKey}: HydrusApiInfo) {
+  return axios.get<{ basic_permissions: number[]; human_description: string }>(`${apiUrl}/verify_access_key`, {
+    headers: {
+      'Hydrus-Client-API-Access-Key': apiKey
+    }
+  })
+}
