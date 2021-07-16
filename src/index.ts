@@ -52,7 +52,7 @@ class Hyextract extends Command {
       hydrusApiUrl: 'http://localhost:45869',
       hydrusApiKey: 'API_KEY_HERE',
       archivesDirectory: path.join(os.homedir(), 'hyextract archives'),
-      tempDirectory: os.tmpdir(),
+      tempDirectory: path.join(os.tmpdir(), 'hyextract'),
       copyTags: true,
       copyUrls: true,
       tagServices: ['my tags'],
