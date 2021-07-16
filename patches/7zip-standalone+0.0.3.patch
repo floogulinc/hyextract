@@ -1,0 +1,13 @@
+diff --git a/node_modules/7zip-standalone/lib/7zip-standalone/SevenZipBinaries.js b/node_modules/7zip-standalone/lib/7zip-standalone/SevenZipBinaries.js
+index 0dfb76f..a10c66f 100644
+--- a/node_modules/7zip-standalone/lib/7zip-standalone/SevenZipBinaries.js
++++ b/node_modules/7zip-standalone/lib/7zip-standalone/SevenZipBinaries.js
+@@ -14,7 +14,7 @@ function get7zPath() {
+ exports.get7zPath = get7zPath;
+ function getPlatformArchPath() {
+     switch (externals_1.OS.platform()) {
+-        case "win32": return externals_1.Path.join("win32", externals_1.OS.arch() === "x64" ? "x64","7z.exe" : "7z.exe");
++        case "win32": return externals_1.Path.join("win32", externals_1.OS.arch() === "x64" ? "x64" : "x86", "7z.exe");
+         case "linux": return externals_1.Path.join("linux", "7z");
+         case "darwin": return externals_1.Path.join("darwin", "7z");
+     }

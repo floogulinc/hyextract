@@ -4,9 +4,9 @@ import * as path from 'path'
 import * as os from 'os'
 import { HydrusFile, lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey } from './hydrus-api'
 import { namespaceTagFromFile, serviceTags, getNamespace, getTagValue } from './tag-utils'
-import * as _7z from '7zip-min';
 import * as util from 'util'
 import * as FileHound from 'filehound';
+import * as sevenZip from '7zip-standalone/lib/7zip-standalone';
 
 interface UserConfig {
   hydrusApiUrl: string;
@@ -26,15 +26,6 @@ interface UserConfig {
   deleteTempFiles: boolean;
 }
 
-// const unpackArchive: (pathToArchive: string, whereToUnpack?: string) => Promise<void> = util.promisify(_7z.unpack);
-// const listArchive: (pathToArchive: string) => Promise<_7z.Result[]> = util.promisify(_7z.list)
-const _7zcmd: (command: string[]) => Promise<void> = util.promisify(_7z.cmd);
-
-function unpackArchive(pathToArchive: string, whereToUnpack: string, password?: string) {
-  const cmd = ['x', pathToArchive, '-y', '-o' + whereToUnpack, ...(password ? ['-p' + password] : [])];
-  return _7zcmd(cmd);
-}
-
 class Hyextract extends Command {
   static description = 'Extract archives from Hydrus with tags and URL associations'
 
@@ -47,6 +38,10 @@ class Hyextract extends Command {
   }
 
   static args = []
+
+  async unpackArchive(pathToArchive: string, whereToUnpack: string, password?: string) {
+    return sevenZip.extract(pathToArchive, whereToUnpack, ['-p' + (password ?? '')], data => data.forEach(s => this.log(s)));
+  }
 
   async run() {
     const {args, flags} = this.parse(Hyextract)
@@ -109,7 +104,7 @@ class Hyextract extends Command {
 
       this.log(`unpacking ${archiveFilePath}`)
       try {
-        await unpackArchive(archiveFilePath, path.join(userConfig.tempDirectory, archiveHash), password);
+        await this.unpackArchive(archiveFilePath, path.join(userConfig.tempDirectory, archiveHash), password);
       } catch (error) {
         this.warn(error);
         this.warn('An error occurred when attempting to unpack this archive, it will be skipped.');
@@ -158,7 +153,7 @@ class Hyextract extends Command {
                 hash: addInfo.hash,
                 urls_to_add: archiveMetadata.known_urls
               }, apiInfo);
-              this.log(`added ${archiveMetadata.known_urls} URLs for file`);
+              this.log(`added ${archiveMetadata.known_urls.length} URLs for file`);
             } catch (error) {
               this.warn('error adding URLs');
               this.warn(error);
