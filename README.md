@@ -63,24 +63,26 @@ Example config file:
 }
 ```
 
-- `hydrusApiUrl`: the URL of your Hydrus API
-- `hydrusApiKey`: an access key for the Hydrus API. It should have all permissions enabled.
-- `archivesDirectory`: the location to look for archives in. This can be a directory you manually export archives to or a Hydrus automatic export folder. All files in this directory must be named `{hash}.ext` where `{hash}` is the SHA256 hash which is how Hydrus will automatically export them when dragged out of the client.
-- `tempDirectory`: this is the temporary directory hyextract will extract archives to and tell Hydrus to import from. It will be wiped automatically if `deleteTempFiles` is enabled.
-- `copyTags`: should hyextract copy tags from the archive to the extracted files.
-- `copyUrls`: should hyextract copy URLs from the archive to the extracted files
-- `tagServices`: an array of the tag services that hyextract will copy tags from if `copyTags` is enabled.
-- `passwordNamespace`: the namespace to pull archive passwords from as plain text. This is used if no hex password is found.
-- `passwordNamespaceHex`: the namespace to pull archive passwords from as hex encoded UTF-8 strings. This is used first before `passwordNamespace`. Some parsers will output archive passwords in this format to preserve capital letters that a plain text tag would remove.
-- `tagBlacklist`: an array of tags to skip copying from the archive to the extracted files.
-- `namespaceBlacklist`: an array of tag namespaces to skip copying from the archive to the extracted files.
-- `tagFilenames` should hyextract add `filename:` tags to extracted files when imported (affected by `copyTags`, not affected by `tagBlacklist` or `namespaceBlacklist`)
-- `filenameTagService`: the service to add `filename:` tags to when `tagFilenames` is enabled.
-- `deleteOriginalArchiveFromDirectory`: should hyextract delete the archive from `archivesDirectory` after importing its tiles.
-- `deleteOriginalArchiveFromHydrus`: should hyextract delete the archive from hydrus after importing its tiles.
-- `deleteTempFiles`: should hyextract clear `tempDirectory` after processing everything
-- `customServicesToTags`: an object that specifies constant tags to add to every extracted file. It is a map of service names to arrays of tags.
-- `moveUnimportedFiles`: should hyextract move files that hydrus was unable to import into a seperate directory.
-- `unimportedFilesDirectory`: the directory to move unimported files to if `moveUnimportedFiles` is enabled.
+| Config Item | Description |
+|----|----|
+| `hydrusApiUrl` | the URL of your Hydrus API |
+| `hydrusApiKey` | an access key for the Hydrus API. It should have all permissions enabled. |
+| `archivesDirectory` | the location to look for archives in. This can be a directory you manually export archives to or a Hydrus automatic export folder. All files in this directory must be named `{hash}.ext` where `{hash}` is the SHA256 hash which is how Hydrus will automatically export them when dragged out of the client. |
+| `tempDirectory` | this is the temporary directory hyextract will extract archives to and tell Hydrus to import from. It will be wiped automatically if `deleteTempFiles` is enabled. |
+| `copyTags` | should hyextract copy tags from the archive to the extracted files. |
+| `copyUrls` | should hyextract copy URLs from the archive to the extracted files |
+| `tagServices` | an array of the tag services that hyextract will copy tags from if `copyTags` is enabled. |
+| `passwordNamespace` | the namespace to pull archive passwords from as plain text. This is used if no hex password is found. |
+| `passwordNamespaceHex` | the namespace to pull archive passwords from as hex encoded UTF-8 strings. This is used first before `passwordNamespace`. Some parsers will output archive passwords in this format to preserve capital letters that a plain text tag would remove. |
+| `tagBlacklist` | an array of tags to skip copying from the archive to the extracted files. |
+| `namespaceBlacklist` | an array of tag namespaces to skip copying from the archive to the extracted files. |
+| `tagFilenames` | should hyextract add `filename:` tags to extracted files when imported (affected by `copyTags`, not affected by `tagBlacklist` or `namespaceBlacklist`) |
+| `filenameTagService` | the service to add `filename:` tags to when `tagFilenames` is enabled. |
+| `deleteOriginalArchiveFromDirectory` | should hyextract delete the archive from `archivesDirectory` after importing its tiles. |
+| `deleteOriginalArchiveFromHydrus` | should hyextract delete the archive from hydrus after importing its tiles. |
+| `deleteTempFiles` | should hyextract clear `tempDirectory` after processing everything |
+| `customServicesToTags` | an object that specifies constant tags to add to every extracted file. It is a map of service names to arrays of tags. |
+| `moveUnimportedFiles` | should hyextract move files that hydrus was unable to import into a seperate directory. |
+| `unimportedFilesDirectory` | the directory to move unimported files to if `moveUnimportedFiles` is enabled. |
 
 If you ever want to regenerate this config file, run `hyextract --regenconfig`.
