@@ -18,7 +18,7 @@ $ npm install -g hyextract
 
 ## Usage
 
-To use hyextract you will need a folder of archive files from Hydrus named `{hash}.ext` where `{hash}` is the SHA256 hash. You can either drag the files from Hydrus into a folder or setup an automatic export folder for all files with the filetype.
+To use hyextract you will need a folder of archive files from Hydrus named `{hash}.ext` where `{hash}` is the SHA256 hash. You can either drag the files from Hydrus into a folder or setup an automatic export folder for all files with the filetype. In most cases, hyextract should be ran on the same machine as Hydrus itself. The path names it sees for extracted files need to be importable by Hydrus.
 
 Running `hyextract` for the first time will create a config file (see below). You will want to fill in your API key from Hydrus and setup any other settings like the directory for archives to process and the temp directory used for extracting them. 
 
@@ -82,7 +82,7 @@ Example config file:
 | `deleteOriginalArchiveFromHydrus` | should hyextract delete the archive from hydrus after importing its tiles. |
 | `deleteTempFiles` | should hyextract clear `tempDirectory` after processing everything |
 | `customServicesToTags` | an object that specifies constant tags to add to every extracted file. It is a map of service names to arrays of tags. |
-| `moveUnimportedFiles` | should hyextract move files that hydrus was unable to import into a seperate directory. |
+| `moveUnimportedFiles` | should hyextract move files that hydrus was unable to import into a separate directory. |
 | `unimportedFilesDirectory` | the directory to move unimported files to if `moveUnimportedFiles` is enabled. |
 
 If you ever want to regenerate this config file, run `hyextract --regenconfig`.
