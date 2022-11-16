@@ -61,7 +61,8 @@ export async function lookupMetadata(hashes: string[], {apiUrl, apiKey}: HydrusA
       'Hydrus-Client-API-Access-Key': apiKey
     },
     params: {
-      hashes: JSON.stringify(hashes)
+      hashes: JSON.stringify(hashes),
+      hide_service_names_tags: false
     }
   })
 }
