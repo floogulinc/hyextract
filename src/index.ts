@@ -2,7 +2,7 @@ import {Command, flags} from '@oclif/command'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as os from 'os'
-import {lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey} from './hydrus-api'
+import {lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey, apiVersion} from './hydrus-api'
 import {namespaceTagFromFile, serviceTags, getNamespace, getTagValue} from './tag-utils'
 import * as FileHound from 'filehound';
 import * as sevenZip from '7zip-standalone/lib/7zip-standalone';
@@ -61,9 +61,12 @@ class Hyextract extends Command {
   }
 
   async run() {
+    this.log(this.config.userAgent);
     const {args, flags} = this.parse(Hyextract)
 
     const configPath = path.join(this.config.configDir, 'config.json');
+
+    this.debug(`config path: ${configPath}`);
 
     const defaultConfig: UserConfig = {
       hydrusApiUrl: 'http://localhost:45869',
@@ -106,8 +109,21 @@ class Hyextract extends Command {
     const apiUrl = userConfig.hydrusApiUrl.replace(/\/$/, '');
     const apiInfo: HydrusApiInfo = {apiUrl, apiKey: userConfig.hydrusApiKey};
 
+    this.debug(userConfig);
+    this.debug(apiInfo);
+
+    try {
+      const versionInfo = await apiVersion(apiInfo);
+      this.debug(versionInfo.data);
+      this.log(`hydrus v${versionInfo.data.hydrus_version}`);
+    } catch (error) {
+      this.log('Error checking API version');
+      this.error(error);
+    }
+
     try {
       const keyInfo = await verifyAccessKey(apiInfo);
+      this.debug(keyInfo.data);
       this.log(keyInfo.data.human_description);
     } catch (error) {
       this.log('Error checking API key');
@@ -131,7 +147,9 @@ class Hyextract extends Command {
       const archiveMetadata = (await lookupMetadata([archiveHash], apiInfo)).data.metadata[0];
 
       const passwordHexTag = namespaceTagFromFile(archiveMetadata, userConfig.passwordHexNamespace);
+      this.debug(`passwordHexTag: ${passwordHexTag}`);
       const passwordTag = namespaceTagFromFile(archiveMetadata, userConfig.passwordNamespace);
+      this.debug(`passwordTag: ${passwordTag}`);
       const password = passwordHexTag ? decodeHex(getTagValue(passwordHexTag)) : passwordTag ? getTagValue(passwordTag) : undefined;
       if (password) {
         this.log(`archive password: "${password}"`);
@@ -151,6 +169,8 @@ class Hyextract extends Command {
       .ignoreHiddenDirectories()
       .ignoreHiddenFiles()
       .find();
+
+      this.debug(newFiles);
 
       this.log(`Found ${newFiles.length} files`);
 

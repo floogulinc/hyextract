@@ -126,3 +126,7 @@ export async function verifyAccessKey({apiUrl, apiKey}: HydrusApiInfo) {
     }
   })
 }
+
+export async function apiVersion({apiUrl}: HydrusApiInfo) {
+  return axios.get<{ version: number; hydrus_version: number }>(`${apiUrl}/api_version`);
+}
