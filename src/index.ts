@@ -139,12 +139,16 @@ class Hyextract extends Command {
     const archivesDir = await fs.opendir(userConfig.archivesDirectory);
 
     for await (const entry of archivesDir) {
+      this.debug(entry);
       if (!entry.isFile()) {
         continue;
       }
       const archiveFilePath = path.join(userConfig.archivesDirectory, entry.name);
+      this.debug(`archiveFilePath: ${archiveFilePath}`);
       const archiveHash = path.parse(entry.name).name;
+      this.debug(`archiveHash: ${archiveHash}`);
       const archiveMetadata = (await lookupMetadata([archiveHash], apiInfo)).data.metadata[0];
+      this.debug(archiveMetadata)
 
       const passwordHexTag = namespaceTagFromFile(archiveMetadata, userConfig.passwordHexNamespace);
       this.debug(`passwordHexTag: ${passwordHexTag}`);
