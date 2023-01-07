@@ -92,7 +92,15 @@ export async function addFile(path: string, {apiUrl, apiKey}: HydrusApiInfo) {
   });
 }
 
-export async function deleteFiles(args: { hash: string } | { hashes: string[] }, {apiUrl, apiKey}: HydrusApiInfo) {
+export async function deleteFiles(args: {
+    hash?: string;
+    hashes?: string[];
+    file_id?: number;
+    file_ids?: number[];
+    file_service_name?: string;
+    file_service_key?: string;
+    reason?: string;
+  }, {apiUrl, apiKey}: HydrusApiInfo) {
   return axios.post(`${apiUrl}/add_files/delete_files`, args, {
     headers: {
       'Hydrus-Client-API-Access-Key': apiKey,

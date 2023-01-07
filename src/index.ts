@@ -255,7 +255,7 @@ class Hyextract extends Command {
       }
       if (userConfig.deleteOriginalArchiveFromHydrus) {
         this.log(`removing ${archiveHash} from Hydrus`);
-        await deleteFiles({hash: archiveHash}, apiInfo);
+        await deleteFiles({hash: archiveHash, reason: 'hyextract'}, apiInfo);
       }
     }
 
