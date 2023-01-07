@@ -1,7 +1,7 @@
 {
   "name": "hyextract",
   "description": "Extract archives from Hydrus with tags and URL associations",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "author": "floogulinc",
   "bin": {
     "hyextract": "./bin/run"
