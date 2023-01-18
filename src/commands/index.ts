@@ -142,6 +142,7 @@ class Hyextract extends Command {
       if (!entry.isFile()) {
         continue;
       }
+
       const archiveFilePath = path.join(userConfig.archivesDirectory, entry.name);
       this.debug(`archiveFilePath: ${archiveFilePath}`);
       const archiveHash = path.parse(entry.name).name;
@@ -165,6 +166,7 @@ class Hyextract extends Command {
         if (error instanceof Error) {
           this.warn(error);
         }
+
         this.warn('An error occurred when attempting to unpack this archive, it will be skipped.');
         continue;
       }
@@ -188,9 +190,11 @@ class Hyextract extends Command {
           if (addInfo.status === HydrusAddFileStatus.PreviouslyDeleted) {
             continue;
           }
+
           if (addInfo.status === HydrusAddFileStatus.Failed) {
             throw new Error('Hydrus returned failed status');
           }
+
           if (userConfig.customServicesToTags) {
             const numCustomTags = Object.values(userConfig.customServicesToTags).map(arr => arr.length).reduce((p, c) => p + c);
             if (numCustomTags > 0) {
@@ -208,6 +212,7 @@ class Hyextract extends Command {
               }
             }
           }
+
           if (userConfig.copyTags) {
             const tagsToAdd = Object.fromEntries(userConfig.tagServices.map(service =>
               [service, serviceTags(archiveMetadata, service)
@@ -217,6 +222,7 @@ class Hyextract extends Command {
               const newFileName = path.parse(newFilePath).name;
               tagsToAdd[userConfig.filenameTagService].push(`filename:${newFileName}`);
             }
+
             const numTags = Object.values(tagsToAdd).map(arr => arr.length).reduce((p, c) => p + c);
             if (numTags > 0) {
               try {
@@ -233,6 +239,7 @@ class Hyextract extends Command {
               }
             }
           }
+
           if (userConfig.copyUrls && archiveMetadata.known_urls.length > 0) {
             try {
               await associateUrl({
@@ -251,9 +258,11 @@ class Hyextract extends Command {
           if (error instanceof Error) {
             this.warn(error);
           }
+
           if (userConfig.moveUnimportedFiles) {
             await this.handleUnimportedFile(newFilePath, userConfig.tempDirectory, userConfig.unimportedFilesDirectory);
           }
+
           continue;
         }
       }
@@ -262,9 +271,15 @@ class Hyextract extends Command {
         this.log(`deleting ${archiveFilePath}`);
         await fs.remove(archiveFilePath);
       }
+
       if (userConfig.deleteOriginalArchiveFromHydrus) {
         this.log(`removing ${archiveHash} from Hydrus`);
         await deleteFiles({hash: archiveHash, reason: 'hyextract'}, apiInfo);
+      }
+
+      if (userConfig.deleteTempFiles) {
+        this.log(`deleting temp directory ${path.join(userConfig.tempDirectory, archiveHash)}`)
+        await fs.remove(path.join(userConfig.tempDirectory, archiveHash));
       }
     }
 
