@@ -1,9 +1,9 @@
-import {Command, flags} from '@oclif/command'
+import {Command, Flags} from '@oclif/core'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as os from 'os'
-import {lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey, apiVersion} from './hydrus-api'
-import {namespaceTagFromFile, serviceTags, getNamespace, getTagValue} from './tag-utils'
+import {lookupMetadata, HydrusApiInfo, addFile, deleteFiles, addTags, associateUrl, HydrusAddFileStatus, verifyAccessKey, apiVersion} from '../hydrus-api'
+import {namespaceTagFromFile, serviceTags, getNamespace, getTagValue} from '../tag-utils'
 import * as FileHound from 'filehound';
 import * as sevenZip from '7zip-standalone/lib/7zip-standalone';
 
@@ -36,14 +36,13 @@ function decodeHex(hexString: string) {
 }
 
 class Hyextract extends Command {
-  static description = 'Extract archives from Hydrus with tags and URL associations'
 
   static flags = {
     // add --version flag to show CLI version
-    version: flags.version({char: 'v'}),
-    help: flags.help({char: 'h'}),
+    version: Flags.version(),
+    help: Flags.help({char: 'h'}),
 
-    regenconfig: flags.boolean({description: 'regenerate the config file'})
+    regenconfig: Flags.boolean({description: 'regenerate the config file'})
   }
 
   static args = []
@@ -61,15 +60,16 @@ class Hyextract extends Command {
   }
 
   async run() {
+    const {args, flags} = await this.parse(Hyextract);
+
     this.log(this.config.userAgent);
-    const {args, flags} = this.parse(Hyextract)
 
     const configPath = path.join(this.config.configDir, 'config.json');
 
     this.debug(`config path: ${configPath}`);
 
     const defaultConfig: UserConfig = {
-      hydrusApiUrl: 'http://localhost:45869',
+      hydrusApiUrl: 'http://localhost:45869', // DevSkim: ignore DS137138
       hydrusApiKey: 'API_KEY_HERE',
       archivesDirectory: path.join(os.homedir(), 'hyextract archives'),
       tempDirectory: path.join(os.tmpdir(), 'hyextract'),
@@ -117,8 +117,8 @@ class Hyextract extends Command {
       this.debug(versionInfo.data);
       this.log(`hydrus v${versionInfo.data.hydrus_version}`);
     } catch (error) {
-      this.log('Error checking API version');
-      this.error(error);
+      this.warn('Error checking API version');
+      throw error;
     }
 
     try {
@@ -126,8 +126,8 @@ class Hyextract extends Command {
       this.debug(keyInfo.data);
       this.log(keyInfo.data.human_description);
     } catch (error) {
-      this.log('Error checking API key');
-      this.error(error);
+      this.warn('Error checking API key');
+      throw error;
     }
 
     await fs.ensureDir(userConfig.tempDirectory);
@@ -163,7 +163,9 @@ class Hyextract extends Command {
       try {
         await this.unpackArchive(archiveFilePath, path.join(userConfig.tempDirectory, archiveHash), password);
       } catch (error) {
-        this.warn(error);
+        if(error instanceof Error) {
+          this.warn(error);
+        }
         this.warn('An error occurred when attempting to unpack this archive, it will be skipped.');
         continue;
       }
@@ -201,7 +203,9 @@ class Hyextract extends Command {
                 this.log(`added ${numCustomTags} custom tags for file`)
               } catch (error) {
                 this.warn('error adding custom tags');
-                this.warn(error);
+                if(error instanceof Error) {
+                  this.warn(error);
+                }
               }
             }
           }
@@ -224,7 +228,9 @@ class Hyextract extends Command {
                 this.log(`added ${numTags} tags for file`);
               } catch (error) {
                 this.warn('error adding tags');
-                this.warn(error);
+                if(error instanceof Error) {
+                  this.warn(error);
+                }
               }
             }
           }
@@ -237,11 +243,15 @@ class Hyextract extends Command {
               this.log(`added ${archiveMetadata.known_urls.length} URLs for file`);
             } catch (error) {
               this.warn('error adding URLs');
-              this.warn(error);
+              if(error instanceof Error) {
+                this.warn(error);
+              }
             }
           }
         } catch (error) {
-          this.warn(error);
+          if(error instanceof Error) {
+            this.warn(error);
+          }
           if (userConfig.moveUnimportedFiles) {
             await this.handleUnimportedFile(newFilePath, userConfig.tempDirectory, userConfig.unimportedFilesDirectory);
           }
