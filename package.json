@@ -8,9 +8,9 @@
   },
   "bugs": "https://github.com/floogulinc/hyextract/issues",
   "dependencies": {
-    "7zip-standalone": "0.0.3",
     "@oclif/core": "^1.24.2",
     "@oclif/plugin-help": "^5.2.0",
+    "7zip-standalone": "0.0.3",
     "axios": "^1.2.3",
     "filehound": "^1.17.6",
     "fs-extra": "^11.0.0",
@@ -19,9 +19,10 @@
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
-    "@types/node": "^16",
     "@types/bluebird": "^3.5.38",
     "@types/fs-extra": "^11.0.1",
+    "@types/lodash": "^4.14.191",
+    "@types/node": "^16",
     "eslint": "^7.32.0",
     "eslint-config-oclif": "^4.0.0",
     "eslint-config-oclif-typescript": "^1.0.3",
