@@ -36,7 +36,6 @@ function decodeHex(hexString: string) {
 }
 
 class Hyextract extends Command {
-
   static flags = {
     // add --version flag to show CLI version
     version: Flags.version(),
@@ -163,7 +162,7 @@ class Hyextract extends Command {
       try {
         await this.unpackArchive(archiveFilePath, path.join(userConfig.tempDirectory, archiveHash), password);
       } catch (error) {
-        if(error instanceof Error) {
+        if (error instanceof Error) {
           this.warn(error);
         }
         this.warn('An error occurred when attempting to unpack this archive, it will be skipped.');
@@ -203,7 +202,7 @@ class Hyextract extends Command {
                 this.log(`added ${numCustomTags} custom tags for file`)
               } catch (error) {
                 this.warn('error adding custom tags');
-                if(error instanceof Error) {
+                if (error instanceof Error) {
                   this.warn(error);
                 }
               }
@@ -228,7 +227,7 @@ class Hyextract extends Command {
                 this.log(`added ${numTags} tags for file`);
               } catch (error) {
                 this.warn('error adding tags');
-                if(error instanceof Error) {
+                if (error instanceof Error) {
                   this.warn(error);
                 }
               }
@@ -243,13 +242,13 @@ class Hyextract extends Command {
               this.log(`added ${archiveMetadata.known_urls.length} URLs for file`);
             } catch (error) {
               this.warn('error adding URLs');
-              if(error instanceof Error) {
+              if (error instanceof Error) {
                 this.warn(error);
               }
             }
           }
         } catch (error) {
-          if(error instanceof Error) {
+          if (error instanceof Error) {
             this.warn(error);
           }
           if (userConfig.moveUnimportedFiles) {

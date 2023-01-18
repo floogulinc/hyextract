@@ -8,6 +8,8 @@
     "@typescript-eslint/no-unused-vars": "warn",
     "semi": "off",
     "max-depth": "off",
-    "complexity": "off"
+    "complexity": "off",
+    "camelcase": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off"
   }
 }

@@ -20,21 +20,8 @@ export function getNamespaceNoSpace(tag: string): string {
   return tag.split(':')[0].replace(/\s+/g, '-').toLowerCase();
 }
 
-export function tagsObjectFromFile(file: HydrusFile): ServiceNamesToStatusesToTags {
-  return file.service_names_to_statuses_to_display_tags ?? file.service_names_to_statuses_to_tags;
-}
-
-function allKnownTags(serviceNamesTostatusesToTags: ServiceNamesToStatusesToTags) {
-  if (serviceNamesTostatusesToTags &&
-    'all known tags' in serviceNamesTostatusesToTags &&
-    '0' in serviceNamesTostatusesToTags['all known tags']) {
-    return serviceNamesTostatusesToTags['all known tags']['0'];
-  }
-  return [];
-}
-
 export function allTagsFromFile(file: HydrusFile): string[] {
-  return allKnownTags(tagsObjectFromFile(file));
+  return file.tags['616c6c206b6e6f776e2074616773']?.display_tags?.[0];
 }
 
 export function namespaceTagFromFile(file: HydrusFile, namespace: string): string | undefined {
@@ -55,5 +42,15 @@ export function getTagValue(tag: string) {
 }
 
 export function serviceTags(file: HydrusFile, service: string) {
-  return file.service_names_to_statuses_to_tags?.[service]?.['0'] ?? [];
+  // return file.service_names_to_statuses_to_tags?.[service]?.['0'] ?? [];
+  return getTagService(file, service)?.storage_tags?.['0'] ?? [];
+}
+
+export function getTagService(file: HydrusFile, serviceName: string) {
+  const result = Object.entries(file.tags).find(([serviceKey, service]) => service.name === serviceName);
+  if (!result) {
+    return undefined;
+  }
+  const [serviceKey, service] = result;
+  return {serviceKey, ...service};
 }
