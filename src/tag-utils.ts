@@ -25,7 +25,7 @@ export function allTagsFromFile(file: HydrusFile): string[] {
 }
 
 export function namespaceTagFromFile(file: HydrusFile, namespace: string): string | undefined {
-  return allTagsFromFile(file).find(a => getNamespace(a) === namespace);
+  return allTagsFromFile(file)?.find(a => getNamespace(a) === namespace);
 }
 
 export function getTagValue(tag: string) {
